@@ -6,12 +6,26 @@
 :{$PORT:8080} {
 	encode zstd gzip
 
+	@preflight method OPTIONS
+
+	header {
+		Access-Control-Allow-Origin "{http.request.header.Origin}"
+		Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+		Access-Control-Allow-Headers "Authorization, Content-Type, X-Client-Version"
+		Access-Control-Allow-Credentials "true"
+		Vary "Origin"
+	}
+
+	respond @preflight 204
+
 	handle_path /blue/* {
-		reverse_proxy {$TLR_BLUE_URL}:{$TLR_BLUE_PORT}
+		rewrite * /api/v1{path}
+		reverse_proxy {$TLR_BLUE_URL:tlr-blue.railway.internal}:{$TLR_BLUE_PORT:8000}
 	}
 
 	handle_path /green/* {
-		reverse_proxy {$TLR_GREEN_URL}:{$TLR_GREEN_PORT}
+		rewrite * /api/v1{path}
+		reverse_proxy {$TLR_GREEN_URL:tlr-green.railway.internal}:{$TLR_GREEN_PORT:8000}
 	}
 
 	handle /health {
