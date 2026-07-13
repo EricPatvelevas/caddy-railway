@@ -1,9 +1,22 @@
-# This is your Caddy configuration. This default config
-# opens a port and serves a static site from the www folder.
-# Edit this file according to your needs.
+{
+	# Railway terminates TLS before traffic reaches this service.
+	auto_https off
+}
 
-# Remember, Railway terminates TLS before it gets to Caddy.
-:8080
+:{$PORT:8080} {
+	encode zstd gzip
 
-root /www
-file_server
+	handle_path /blue/* {
+		reverse_proxy {$TLR_BLUE_URL}
+	}
+
+	handle_path /green/* {
+		reverse_proxy {$TLR_GREEN_URL}
+	}
+
+	handle /health {
+		respond "ok" 200
+	}
+
+	respond "Caddy proxy is running" 200
+}
