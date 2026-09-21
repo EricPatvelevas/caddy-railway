@@ -16,24 +16,31 @@
 		Vary "Origin"
 	}
 
-	respond @preflight 204
+	# Handle browser preflight before selecting a service upstream.
+	route {
+		respond @preflight 204
 
-	handle_path /blue/* {
-		reverse_proxy {$TLR_BLUE_URL:tlr-blue.railway.internal}:{$TLR_BLUE_PORT:8000}
+		handle_path /purple/* {
+			reverse_proxy {$TLR_PURPLE_URL:tlr-purple.railway.internal}:{$TLR_PURPLE_PORT:8003}
+		}
+
+		handle_path /blue/* {
+			reverse_proxy {$TLR_BLUE_URL:tlr-blue.railway.internal}:{$TLR_BLUE_PORT:8000}
+		}
+
+		handle /green/api/v1/application-qa/* {
+			uri strip_prefix /green
+			reverse_proxy {$TLR_GREEN_CHATTER_URL:tlr-green-chatter.railway.internal}:{$TLR_GREEN_CHATTER_PORT:8000}
+		}
+
+		handle_path /green/* {
+			reverse_proxy {$TLR_GREEN_URL:tlr-green.railway.internal}:{$TLR_GREEN_PORT:8000}
+		}
+
+		handle /health {
+			respond "ok" 200
+		}
+
+		respond "Caddy proxy is running" 200
 	}
-
-	handle /green/api/v1/application-qa/* {
-		uri strip_prefix /green
-		reverse_proxy {$TLR_GREEN_CHATTER_URL:tlr-green-chatter.railway.internal}:{$TLR_GREEN_CHATTER_PORT:8000}
-	}
-
-	handle_path /green/* {
-		reverse_proxy {$TLR_GREEN_URL:tlr-green.railway.internal}:{$TLR_GREEN_PORT:8000}
-	}
-
-	handle /health {
-		respond "ok" 200
-	}
-
-	respond "Caddy proxy is running" 200
 }
