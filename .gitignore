@@ -1,0 +1,13 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+.local/
+client_secret_*.json
+service-account*.json
+
+# Logs and operating system files
+*.log
+.DS_Store
+Thumbs.db
