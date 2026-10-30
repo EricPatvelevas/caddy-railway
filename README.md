@@ -3,6 +3,30 @@ Caddy on Railway
 
 The official template used to deploy Caddy on [Railway](https://railway.com).
 
+## TLR White and Gem
+
+The gateway routes `/white/*` to `tlr-white.railway.internal:8000`, stripping only
+the `/white` prefix. Override `TLR_WHITE_URL` (hostname) and `TLR_WHITE_PORT` if
+the Railway service name or listening port differs. Configure White with
+`ROOT_PATH=/white`, Green's JWT key/algorithm, shared MongoDB infrastructure and
+its own `tlr_white_db` database. Use one White worker and one replica.
+
+Gem uses this gateway's HTTPS origin as **System gateway** (or `GEM_GATEWAY_URL`).
+It signs in and refreshes through `/green/api/v1/auth` and requests streamed answers
+through `/white/api/v1`. GL uses
+`VITE_WHITE_API_BASE_URL=https://your-gateway/white/api/v1`. Gem is a Windows client;
+it does not need its own reverse-proxy route or a publicly exposed local port.
+
+White's NDJSON route uses `flush_interval 1ms` to deliver progressive output while
+retaining cancellation of upstream work when the client disconnects. A negative
+flush interval changes disconnect cancellation behavior, so this route uses a
+short positive interval. See [Caddy streaming documentation](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#streaming).
+
+Check readiness at `/white/api/v1/health/ready`; `/health` remains gateway liveness.
+For local development, Green's own Caddy configuration also includes `/white/*`,
+with `CADDY_WHITE_API_UPSTREAM` defaulting to `host.docker.internal:8004`.
+These repository changes do not deploy a Railway service.
+
 ## How to use
 
 Click this button:

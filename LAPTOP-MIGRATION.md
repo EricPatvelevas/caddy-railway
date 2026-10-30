@@ -22,11 +22,14 @@ Do not copy `.venv`, `node_modules`, build output, or caches to recreate a setup
 
 ## Windows and WSL are separate environments
 
-The existing Green, Blue, Yellow, and Purple virtual environments report Windows
-CPython 3.14.6. White's virtual environment reports Linux CPython 3.14.6.
-Create each environment from the intended terminal on the new laptop: Windows
-PowerShell for Windows Python, or a WSL terminal for Linux Python. A Python
-virtual environment cannot be shared between Windows and Linux.
+Green, Blue, Yellow, Purple, and White now use Windows CPython 3.14.6 for local
+development. White was migrated from Linux to Windows after the initial audit;
+its previous environment is retained in its ignored
+`.local/venv-linux-backup-20261028` directory.
+Recreate these local environments from Windows PowerShell on the new laptop,
+and open the projects in a local Windows VS Code window. Docker builds use
+their own Linux environments. A Python virtual environment cannot be shared
+between Windows and Linux.
 
 The checked-in VS Code tasks are also part of the setup. In particular,
 tlr-gl's packaging tasks invoke pnpm, PowerShell, and WinRAR at

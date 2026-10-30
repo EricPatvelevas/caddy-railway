@@ -20,6 +20,13 @@
 	route {
 		respond @preflight 204
 
+		handle_path /white/* {
+			reverse_proxy {$TLR_WHITE_URL:tlr-white.railway.internal}:{$TLR_WHITE_PORT:8000} {
+				# Flush promptly while retaining upstream cancellation on disconnect.
+				flush_interval 1ms
+			}
+		}
+
 		handle_path /yellow/* {
 			reverse_proxy {$TLR_YELLOW_URL:tlr-yellow.railway.internal}:{$TLR_YELLOW_PORT:8000}
 		}
